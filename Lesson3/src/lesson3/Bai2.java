@@ -10,31 +10,12 @@ package lesson3;
  * @author Wind
  */
 public class Bai2 {
+
     public static void main(String[] args) {
-        
-        // tạo TK git
-        // Tải Git 
-        // tạo repository
-        // clone repo về máy
-        // vứt hết project vào thư mục đấy
-        // đồng bộ hóa máy tính với TK GIT:
-          //git add .
-          //git commit -m 'TenPhienBan'
-          //git push origin master
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+        String s1 = "Hello";
+        String s2 = "Hello";
+        String s3 = new String("Hello");
+        System.out.println(s3.substring(2));
+
     }
 }

@@ -15,6 +15,7 @@ public class HelloWorld {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-            
+        String a = "Thang";
+        System.out.println(a.contains("Tha"));
     }
 }
