@@ -1,5 +1,0 @@
-
-b:b
-a:a
-c:c
-gin:gi
