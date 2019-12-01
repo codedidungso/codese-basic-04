@@ -9,7 +9,7 @@ import java.net.*;
 import java.io.*;
 
 public class TCPClient {
-
+//
     public static void main(String[] args) throws Exception {
         try {
             Socket socket = new Socket("127.0.0.1", 8889);
@@ -17,11 +17,11 @@ public class TCPClient {
             DataOutputStream outStream = new DataOutputStream(socket.getOutputStream());
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             String clientMessage = "", serverMessage = "";
-            while (!clientMessage.equals("bye")) {
-                System.out.println("Enter number :");
+                System.out.println("Type -help to show command");
+            while (!clientMessage.equals("-exit")) {
                 clientMessage = br.readLine();
                 outStream.writeUTF(clientMessage);
-                outStream.flush();
+                outStream.flush(); 
                 serverMessage = inStream.readUTF();
                 System.out.println(serverMessage);
             }
@@ -31,6 +31,6 @@ public class TCPClient {
         } catch (Exception e) {
             System.out.println(e);
         }
-        
+
     }
 }
