@@ -24,6 +24,7 @@ class ServerClientThread extends Thread {
     String user;
     String pass;
     String adminOf = "";
+    String memberOf = "";
 
     ServerClientThread(Socket inSocket, int counter) {
         serverClient = inSocket;
@@ -113,6 +114,34 @@ class ServerClientThread extends Thread {
                             outStream.flush();
                         } else {
                             isLogin = true;
+                            File f = new File(".\\data\\userdata\\Groups");
+                            adminOf = "";
+                            memberOf = "";
+                            for (File file : f.listFiles()) {
+                                File readme = new File(file + "\\" + "info.txt");
+                                BufferedReader readerReadme = new BufferedReader(new FileReader(readme));
+                                String line1 = readerReadme.readLine();
+                                if (user.equals(line1)) {
+                                    if (adminOf.equals("")) {
+                                        adminOf += file.getName();
+                                    } else {
+                                        adminOf += ", " + file.getName();
+                                    }
+                                }
+                                String line2 = readerReadme.readLine();
+                                String members = line2.substring(7);
+                                for (String member : members.split(",")) {
+                                    if (user.equals(member)) {
+                                        if (memberOf.equals("")) {
+                                            memberOf += file.getName();
+                                        } else {
+                                            memberOf += ", " + file.getName();
+                                        }
+                                    }
+                                }
+
+                            }
+
                             System.out.println("user: " + User0Pass1[0]);
                             System.out.println("pass: " + User0Pass1[1]);
                             outStream.writeUTF("Hi " + User0Pass1[0] + "!");
@@ -184,9 +213,17 @@ class ServerClientThread extends Thread {
                             FileWriter fr2 = new FileWriter(f2, true);
                             SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
                             Date date = new Date();
-                            fr2.write(user + "\r\n" + "Created at :" + formatter.format(date));
+                            fr2.write(user + "\r\n" + "member:\r\n" + "Created at :" + formatter.format(date));
                             fr2.flush();
                             fr2.close();
+
+                            File f3 = new File(f.getPath() + "/notification.txt");
+                            f3.createNewFile();
+                            if (adminOf.equals("")) {
+                                adminOf += groupName;
+                            } else {
+                                adminOf += ", " + groupName;
+                            }
                             outStream.writeUTF("group created");
                             outStream.flush();
                         }
@@ -197,23 +234,7 @@ class ServerClientThread extends Thread {
                 }//showInfo
                 else if (clientMessage.equals("-info")) {
                     if (isLogin) {
-                        //get admin Info
-                        File f = new File(".\\data\\userdata\\Groups");
-                        adminOf = "";
-                        for (File file : f.listFiles()) {
-                            File readme = new File(file + "\\" + "info.txt");
-                            BufferedReader readerReadme = new BufferedReader(new FileReader(readme));
-                            String temp = readerReadme.readLine();
-                            if (user.equals(temp)) {
-                                if (adminOf.equals("")) {
-                                    adminOf += file.getName();
-                                } else {
-                                    adminOf += ", " + file.getName();
-                                }
-                            }
-
-                        }
-                        outStream.writeUTF("Account:" + user + "\nLeadGroup:" + adminOf);
+                        outStream.writeUTF("Account:" + user + "\nLeadGroup:" + adminOf + "\nMember Of:" + memberOf);
                         outStream.flush();
                         //
                     } else {
@@ -229,6 +250,56 @@ class ServerClientThread extends Thread {
                     }
                     outStream.writeUTF(data);
                     outStream.flush();
+                }//jofnGroup
+                else if (clientMessage.equals("-join")) {
+                    File f = new File(".\\data\\userdata\\Groups");
+                    String data = "";
+                    for (File files : f.listFiles()) {
+                        BufferedReader reader;
+                        reader = new BufferedReader(new FileReader(new File(f.getPath() + "\\" + files.getName() + "\\info.txt")));
+                        String line = reader.readLine();
+                        String line2 = reader.readLine();
+                        boolean isJoin = false;
+                        String members = line2.substring(7);
+                        for (String member : members.split(",")) {
+                            if (member.equals(user)) {
+                                isJoin = true;
+                                break;
+                            }
+                        }
+
+                        if (!line.equals(user) && !isJoin) {
+                            data += files.getName() + "\n";
+                        }
+
+                        reader.close();
+
+                    }
+                    outStream.writeUTF(data + "Which group do you want to join? \n");
+                    outStream.flush();
+
+                    boolean groupIsValid = false;
+                    clientMessage = inStream.readUTF();
+                    for (String d : data.split("\n")) {
+                        if (clientMessage.equals(d)) {
+                            // thao tac xin join
+                            File joinFile = new File(".\\data\\userdata\\Groups" + "\\" + d + "\\notification.txt");
+                            FileWriter fr = new FileWriter(joinFile, true);
+                            fr.write(user + " requested to join your group\r\n");
+                            fr.flush();
+                            fr.close();
+                            outStream.writeUTF("Requested");
+                            outStream.flush();
+                            groupIsValid = true;
+                            break;
+
+                        }
+                    }
+                    if (!groupIsValid) {
+                        outStream.writeUTF("Group not exist");
+                        outStream.flush();
+                    }
+
                 }
 
             }
