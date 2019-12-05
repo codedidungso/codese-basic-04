@@ -21,14 +21,36 @@ class ServerClientThread extends Thread {
     Socket serverClient;
     int clientNo;
     int squre;
-    String user;
-    String pass;
-    String adminOf = "";
-    String memberOf = "";
+    static String user;
+    static String pass;
+    static String adminOf = "";
+    static String memberOf = "";
+    static String noti = "";
 
     ServerClientThread(Socket inSocket, int counter) {
         serverClient = inSocket;
         clientNo = counter;
+    }
+
+    public static void getNotification() {
+        // file1, file2, 
+        for (String adminOfGroups : adminOf.split(", ")) {
+            File directToNotification = new File(".\\data\\userdata\\Groups\\" + adminOfGroups + "\\" + "notification.txt");
+            BufferedReader reader;
+            try {
+                reader = new BufferedReader(new FileReader(directToNotification));
+                String line = reader.readLine();
+                while (line != null) {
+                    noti += line + "\n";
+                    line = reader.readLine();
+                }
+
+                reader.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
     }
 
     public void run() {
@@ -285,7 +307,7 @@ class ServerClientThread extends Thread {
                             // thao tac xin join
                             File joinFile = new File(".\\data\\userdata\\Groups" + "\\" + d + "\\notification.txt");
                             FileWriter fr = new FileWriter(joinFile, true);
-                            fr.write(user + " requested to join your group\r\n");
+                            fr.write(user + " requested to join group " + clientMessage + "\r\n");
                             fr.flush();
                             fr.close();
                             outStream.writeUTF("Requested");
@@ -300,6 +322,22 @@ class ServerClientThread extends Thread {
                         outStream.flush();
                     }
 
+                }//getNotification
+                else if (clientMessage.equals("-getNoti")) {
+                    ServerClientThread.getNotification();
+                    //
+                    String temp = "Command : < Line:Y/N >";
+                    outStream.writeUTF(noti + temp);
+                    outStream.flush();
+                    clientMessage = inStream.readUTF();
+                    String[] line0Type1 = new String[2];
+                    int index = 0;
+                    for (String s : clientMessage.split(":")) {
+                        line0Type1[index] = s;
+                        index++;
+                    }
+                    
+                    // xoa notifi day
                 }
 
             }
