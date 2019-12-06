@@ -11,10 +11,15 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 class ServerClientThread extends Thread {
 
@@ -32,8 +37,37 @@ class ServerClientThread extends Thread {
         clientNo = counter;
     }
 
+    public static void replaceLine(int line, String replace, File f) throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(f));
+        ArrayList<String> data = new ArrayList<>();
+        String l = reader.readLine();
+        data.add(l);
+        while (l != null) {
+            l = reader.readLine();
+            data.add(l);
+        }
+        reader.close();
+        data.set(line, replace);
+        for (int i = 0; i < data.size(); i++) {
+            System.out.println(data.get(i));
+        }
+        String result = "";
+        for (int i = 0; i < data.size(); i++) {
+            if (i == data.size() - 1) {
+                continue;
+            }
+            result += data.get(i) + "\n";
+
+        }
+        FileWriter fr = new FileWriter(f, false);
+        fr.write(result);
+        fr.flush();
+        fr.close();
+
+    }
+
     public static void getNotification() {
-        // file1, file2, 
+        noti = "";
         for (String adminOfGroups : adminOf.split(", ")) {
             File directToNotification = new File(".\\data\\userdata\\Groups\\" + adminOfGroups + "\\" + "notification.txt");
             BufferedReader reader;
@@ -51,6 +85,14 @@ class ServerClientThread extends Thread {
             }
 
         }
+    }
+
+    public static void removeLine(String lineContent, File f) throws IOException {
+        File file = f;
+        List<String> out = Files.lines(file.toPath())
+                .filter(line -> !line.contains(lineContent))
+                .collect(Collectors.toList());
+        Files.write(file.toPath(), out, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
     }
 
     public void run() {
@@ -325,19 +367,72 @@ class ServerClientThread extends Thread {
                 }//getNotification
                 else if (clientMessage.equals("-getNoti")) {
                     ServerClientThread.getNotification();
-                    //
-                    String temp = "Command : < Line:Y/N >";
+                    String temp = "Command : < Line (0->n) :Y/N > or back";
                     outStream.writeUTF(noti + temp);
                     outStream.flush();
                     clientMessage = inStream.readUTF();
-                    String[] line0Type1 = new String[2];
-                    int index = 0;
-                    for (String s : clientMessage.split(":")) {
-                        line0Type1[index] = s;
-                        index++;
+                    if (clientMessage.equals("-back")) {
+                        outStream.writeUTF("Backed");
+                        outStream.flush();
+                    } else {
+                        String[] line0Type1 = new String[2];
+                        int index = 0;
+                        for (String s : clientMessage.split(":")) {
+                            line0Type1[index] = s;
+                            index++;
+                        }
+                        ArrayList<String> listNoti = new ArrayList<>();
+                        for (String string : noti.split("\n")) {
+                            listNoti.add(string);
+
+                        }
+                        if (line0Type1[1].equals("N")) {
+                            // not accept
+                            String contentLine = listNoti.get(Integer.valueOf(line0Type1[0]));
+                            ArrayList<String> groupName = new ArrayList<>();
+                            String contentToArray[] = new String[6];
+                            int i = 0;
+                            for (String s : contentLine.split(" ")) {
+                                contentToArray[i] = s;
+                                i++;
+                            }
+                            String nameUser = contentToArray[0];
+                            String group = contentToArray[5];
+                            File directNoti = new File(".\\data\\userdata\\Groups" + "\\" + group + "\\notification.txt");
+                            removeLine(contentLine, directNoti);
+                            outStream.writeUTF("DENY DONE");
+                            outStream.flush();
+                        } else if (line0Type1[1].equals("Y")) {
+                            //accept
+                            System.out.println("Run here");
+                            String contentLine = listNoti.get(Integer.valueOf(line0Type1[0]));
+                            ArrayList<String> groupName = new ArrayList<>();
+                            String contentToArray[] = new String[6];
+                            int i = 0;
+                            for (String s : contentLine.split(" ")) {
+                                contentToArray[i] = s;
+                                i++;
+                            }
+                            String nameUser = contentToArray[0];
+                            String group = contentToArray[5];
+                            File directNoti = new File(".\\data\\userdata\\Groups" + "\\" + group + "\\notification.txt");
+                            removeLine(contentLine, directNoti);
+                            // add to member in info.txt
+                            File directInfo = new File(".\\data\\userdata\\Groups" + "\\" + group + "\\info.txt");
+                            BufferedReader reader = new BufferedReader(new FileReader(directInfo));
+                            reader.readLine();
+                            String currentMember = reader.readLine();
+                            if (currentMember.equals("member:")) {
+                                currentMember += nameUser;
+                            } else {
+                                currentMember += "," + nameUser;
+                            }
+                            replaceLine(1, currentMember, directInfo);
+                            outStream.writeUTF("ACCEPT DONE");
+                            outStream.flush();
+                        }
+
                     }
-                    
-                    // xoa notifi day
                 }
 
             }

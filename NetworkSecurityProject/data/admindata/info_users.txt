@@ -1,4 +1,6 @@
 
-admin:admin
 thang:thang
 thu:thu
+xuan:xuan
+admin:amdin
+ngocanh:ngocanh

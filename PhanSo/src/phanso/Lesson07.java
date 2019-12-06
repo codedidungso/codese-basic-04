@@ -21,7 +21,7 @@ public class Lesson07 {
 
         // Ten MSSV Tuoi Gioi Tinh
         // HienThi Getter Setter 
-        Scanner sc = new Scanner(System.in);
+        Scanner sc1 = new Scanner(System.in);
 
         while (true) {
             System.out.println("------------------------------");
@@ -30,7 +30,7 @@ public class Lesson07 {
             System.out.println("3.Sua sinh vien");
             System.out.println("4.Xoa sinh vien");
             System.out.println("Chon 1 2 3 4");
-            switch (sc.nextInt()) {
+            switch (sc1.nextInt()) {
                 case 1:
                     hienThiSinhVien();
                     break;
