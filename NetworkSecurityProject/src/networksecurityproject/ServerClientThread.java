@@ -5,6 +5,7 @@
  */
 package networksecurityproject;
 
+import DigitalCertificate.GenerateKeys;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -254,6 +255,16 @@ class ServerClientThread extends Thread {
                             fr.write("\r\n" + user + ":" + pass);
                             fr.flush();
                             fr.close();
+                            //Create Files
+                            File privateKey = new File(".\\data\\admindata\\keyStore\\privateKeys\\" + user + "'s_Private_Key.txt");
+                            File publicKey = new File(".\\data\\admindata\\keyStore\\publicKeys\\" + user + "'s_Public_Key.txt");
+                            privateKey.createNewFile();
+                            publicKey.createNewFile();
+                            //Generate KeyPairs
+                            GenerateKeys myKeys = new GenerateKeys(1024);
+                            myKeys.createKeys();
+                            myKeys.writeToFile(publicKey, myKeys.getPublicKey().getEncoded());
+                            myKeys.writeToFile(privateKey, myKeys.getPrivateKey().getEncoded());
                             outStream.writeUTF("done");
                             outStream.flush();
                         }
@@ -433,8 +444,23 @@ class ServerClientThread extends Thread {
                         }
 
                     }
-                }
+                } //uploadFile
+                else if (clientMessage.equals("-upload")) {
+                    String groupsPermitted = adminOf + ", " + memberOf;
+                    System.out.println(groupsPermitted);
+                    groupsPermitted = groupsPermitted.replaceAll(", ", "\n");
+                    outStream.writeUTF(groupsPermitted + "\nGroup upload: ");
+                    outStream.flush();
+                    String group = inStream.readUTF();
+                    outStream.writeUTF("FileName: ");
+                    outStream.flush();
+                    String fileName = inStream.readUTF();
+                    outStream.writeUTF("Data: ");
+                    outStream.flush();
+                    String data = inStream.readUTF();
+                    // not done yet
 
+                }
             }
             inStream.close();
             outStream.close();

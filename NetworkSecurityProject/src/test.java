@@ -12,19 +12,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.swing.JFileChooser;
 
 public class test {
 
     public static void main(String[] args) throws IOException {
-        ArrayList<String> data = new ArrayList<>();
-        data.add("thang\n");
-        data.add("thang2\n");
-        data.add("thang3\n");
-        data.add("thang4\n");
-        data.remove(0);
-        for (int i = 0; i < data.size(); i++) {
-            System.out.print(data.get(i));
-        }
+        JFileChooser j = new JFileChooser("C:\\Users\\Wind\\Documents\\NetBeansProjects\\codese-basic-04\\NetworkSecurityProject");
+        int result = j.showOpenDialog(j);
     }
 
     public void removeLine(String lineContent, File f) throws IOException {

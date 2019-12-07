@@ -4,3 +4,6 @@ thu:thu
 xuan:xuan
 admin:amdin
 ngocanh:ngocanh
+cac:cac
+tien:tien
+popo:popo
