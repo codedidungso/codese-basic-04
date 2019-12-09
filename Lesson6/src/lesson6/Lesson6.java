@@ -13,7 +13,7 @@ public class Lesson6 {
 
     public static void main(String[] args) {
         PhanSo p = new PhanSo();
-        p.tuso = 5;
+//        p.tuso = 5;
         p.mauso = 8;
         p.ten = "A";
 //        PhanSo p2 = new PhanSo(3, 4);

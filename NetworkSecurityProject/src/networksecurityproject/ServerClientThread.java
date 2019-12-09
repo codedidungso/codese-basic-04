@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 
 class ServerClientThread extends Thread {
 
@@ -446,19 +448,19 @@ class ServerClientThread extends Thread {
                     }
                 } //uploadFile
                 else if (clientMessage.equals("-upload")) {
-                    String groupsPermitted = adminOf + ", " + memberOf;
-                    System.out.println(groupsPermitted);
-                    groupsPermitted = groupsPermitted.replaceAll(", ", "\n");
-                    outStream.writeUTF(groupsPermitted + "\nGroup upload: ");
-                    outStream.flush();
-                    String group = inStream.readUTF();
-                    outStream.writeUTF("FileName: ");
-                    outStream.flush();
-                    String fileName = inStream.readUTF();
-                    outStream.writeUTF("Data: ");
-                    outStream.flush();
-                    String data = inStream.readUTF();
-                    // not done yet
+//                    String groupsPermitted = adminOf + ", " + memberOf;
+//                    System.out.println(groupsPermitted);
+//                    groupsPermitted = groupsPermitted.replaceAll(", ", "\n");
+//                    outStream.writeUTF(groupsPermitted + "\nGroup upload: ");
+//                    outStream.flush();
+//                    String group = inStream.readUTF();
+//                    outStream.writeUTF("FileName: ");
+//                    outStream.flush();
+//                    String fileName = inStream.readUTF();
+//                    outStream.writeUTF("Data: ");
+//                    outStream.flush();
+//                    String data = inStream.readUTF();
+//                    // not done yet
 
                 }
             }

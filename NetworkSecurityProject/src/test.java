@@ -13,12 +13,19 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
-public class test {
+public class test extends Thread {
+
+    public test() {
+        System.out.println("test run");
+    }
 
     public static void main(String[] args) throws IOException {
-        JFileChooser j = new JFileChooser("C:\\Users\\Wind\\Documents\\NetBeansProjects\\codese-basic-04\\NetworkSecurityProject");
-        int result = j.showOpenDialog(j);
+        JFrame f = new JFrame();
+        JFileChooser chooser = new JFileChooser();
+        chooser.showOpenDialog(f);
     }
 
     public void removeLine(String lineContent, File f) throws IOException {
@@ -56,6 +63,10 @@ public class test {
         fr.flush();
         fr.close();
 
+    }
+
+    public void run() {
+        System.out.println("Thread run");
     }
 
 }
