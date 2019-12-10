@@ -17,7 +17,8 @@ import java.util.List;
 
 public class VerifyMessage {
 
-    private List<byte[]> list;
+    public List<byte[]> list;
+    public boolean isVerifyed;
 
     @SuppressWarnings("unchecked")
     //The constructor of VerifyMessage class retrieves the byte arrays from the File and prints the message only if the signature is verified.
@@ -25,7 +26,8 @@ public class VerifyMessage {
         ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename));
         this.list = (List<byte[]>) in.readObject();
         in.close();
-        System.out.println(verifySignature(list.get(0), list.get(1), keyFile) ? "VERIFIED MESSAGE" + "\n----------------\n" + new String(list.get(0)) : "Could not verify the signature.");
+        isVerifyed = verifySignature(list.get(0), list.get(1), keyFile);
+        //System.out.println(verifySignature(list.get(0), list.get(1), keyFile) ? "VERIFIED MESSAGE" + "\n----------------\n" + new String(list.get(0)) : "Could not verify the signature.");
     }
 
     //Method for signature verification that initializes with the Public Key, updates the data to be verified and then verifies them using the signature

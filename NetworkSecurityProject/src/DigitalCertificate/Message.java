@@ -49,8 +49,9 @@ public class Message {
     }
 
     //Method to write the List of byte[] to a file
-    private void writeToFile(String filename) throws FileNotFoundException, IOException {
+    public void writeToFile(String filename) throws FileNotFoundException, IOException {
         File f = new File(filename);
+        
         ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename));
         out.writeObject(list);
         out.close();

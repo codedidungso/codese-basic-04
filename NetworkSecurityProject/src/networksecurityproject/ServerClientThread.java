@@ -6,6 +6,8 @@
 package networksecurityproject;
 
 import DigitalCertificate.GenerateKeys;
+import DigitalCertificate.Message;
+import DigitalCertificate.VerifyMessage;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -257,8 +259,11 @@ class ServerClientThread extends Thread {
                             fr.write("\r\n" + user + ":" + pass);
                             fr.flush();
                             fr.close();
+                            //Create HomeDirectory
+                            File user_Folder = new File("G:\\DataDigitalSignatureProject\\" + user);
+                            user_Folder.mkdir();
                             //Create Files
-                            File privateKey = new File(".\\data\\admindata\\keyStore\\privateKeys\\" + user + "'s_Private_Key.txt");
+                            File privateKey = new File(user_Folder.getPath() + "\\" + user + "'s_Private_Key.txt");
                             File publicKey = new File(".\\data\\admindata\\keyStore\\publicKeys\\" + user + "'s_Public_Key.txt");
                             privateKey.createNewFile();
                             publicKey.createNewFile();
@@ -267,6 +272,7 @@ class ServerClientThread extends Thread {
                             myKeys.createKeys();
                             myKeys.writeToFile(publicKey, myKeys.getPublicKey().getEncoded());
                             myKeys.writeToFile(privateKey, myKeys.getPrivateKey().getEncoded());
+
                             outStream.writeUTF("done");
                             outStream.flush();
                         }
@@ -448,19 +454,107 @@ class ServerClientThread extends Thread {
                     }
                 } //uploadFile
                 else if (clientMessage.equals("-upload")) {
-//                    String groupsPermitted = adminOf + ", " + memberOf;
-//                    System.out.println(groupsPermitted);
-//                    groupsPermitted = groupsPermitted.replaceAll(", ", "\n");
-//                    outStream.writeUTF(groupsPermitted + "\nGroup upload: ");
-//                    outStream.flush();
-//                    String group = inStream.readUTF();
-//                    outStream.writeUTF("FileName: ");
-//                    outStream.flush();
-//                    String fileName = inStream.readUTF();
-//                    outStream.writeUTF("Data: ");
-//                    outStream.flush();
-//                    String data = inStream.readUTF();
-//                    // not done yet
+                    FileDialog dialog = new FileDialog(user);
+                    String pathFile = dialog.choosePath;
+                    String filePicked = dialog.chooseFileName;
+                    if (pathFile.equals("")) {
+                        outStream.writeUTF("Canceled");
+                        outStream.flush();
+                    } else {
+                        File f = new File(".\\data\\userdata\\Groups");
+                        String data = "";
+                        for (File files : f.listFiles()) {
+                            BufferedReader reader;
+                            reader = new BufferedReader(new FileReader(new File(f.getPath() + "\\" + files.getName() + "\\info.txt")));
+                            String line = reader.readLine();
+                            String line2 = reader.readLine();
+                            boolean isJoin = false;
+                            String members = line2.substring(7);
+                            for (String member : members.split(",")) {
+                                if (member.equals(user)) {
+                                    isJoin = true;
+                                    break;
+                                }
+                            }
+                            if (line.equals(user) || isJoin) {
+                                data += files.getName() + "\n";
+                            }
+                            reader.close();
+                        }
+                        outStream.writeUTF("Picked: " + filePicked + "\nUpload to group? \n" + data + "-------------------");
+                        outStream.flush();
+                        String groupUploadInTo = inStream.readUTF();
+                        //uploadFileHash
+                        //-> getDataOfFileChoosen
+                        BufferedReader reader;
+                        File fileChoosen = new File(pathFile);
+                        reader = new BufferedReader(new FileReader(fileChoosen));
+                        String temp = "";
+                        String fileContent = reader.readLine();
+                        temp += fileContent;
+                        while (fileContent != null) {
+                            temp += fileContent + "\r\n";
+                            fileContent = reader.readLine();
+                        }
+                        reader.close();
+                        Message s = new Message(temp, "G:\\DataDigitalSignatureProject\\" + user + "\\" + user + "'s_Private_Key.txt");
+                        s.writeToFile("data\\userdata\\Groups\\" + groupUploadInTo + "\\(" + user + ")" + filePicked);
+                        outStream.writeUTF("UPLOAD DONE");
+                        outStream.flush();
+                        //
+                    }
+                } else if (clientMessage.equals("-download")) {
+                    FileDownLoadDialog dialog = new FileDownLoadDialog();
+                    String pathFile = dialog.choosePath;
+                    String filePicked = dialog.chooseFileName;
+                    if (pathFile.equals("")) {
+                        outStream.writeUTF("Canceled");
+                        outStream.flush();
+                    } else {
+                        boolean isJoined = false;;
+                        ArrayList<String> token = new ArrayList<>();
+                        for (String s : pathFile.split("\\\\")) {
+                            token.add(s);
+                        }
+                        String groupPicked = token.get(token.size() - 2);
+                        String adminOfMemberOf = adminOf + ", " + memberOf;
+                        for (String s : adminOfMemberOf.split(", ")) {
+                            if (groupPicked.equals(s)) {
+                                isJoined = true;
+                                break;
+                            }
+                        }
+                        if (isJoined && !filePicked.equals("notification.txt") && !filePicked.equals("info.txt")) {
+                            //Encripted File, need hashedData, publicKey.
+                            // => getHashedData
+                            // => get PublicKey Owner 
+                            String fileName = filePicked;
+                            String[] Owner0name1 = fileName.split("\\)");
+                            Owner0name1[0] = Owner0name1[0].substring(1);
+                            String PublicKey = "data\\admindata\\keyStore\\publicKeys\\" + Owner0name1[0] + "'s_Public_Key.txt"; //***********
+                            System.out.println("pathFile:" + pathFile);
+                            System.out.println("publicKey:" + PublicKey);
+                            VerifyMessage vrm = new VerifyMessage(pathFile, PublicKey);
+                            if (vrm.isVerifyed) {
+                                String dataEncripted = new String(vrm.list.get(0));
+                                File f = new File("G:\\DataDigitalSignatureProject\\" + user + "\\" + filePicked);
+                                FileWriter fr = new FileWriter(f, true);
+                                fr.write(dataEncripted);
+                                fr.flush();
+                                fr.close();
+                                outStream.writeUTF("Verified, downloaded");
+                                outStream.flush();
+                            } else {
+                                outStream.writeUTF("Not Verified, can't download");
+                                outStream.flush();
+                            }
+
+                        } else {
+                            outStream.writeUTF("You have no permission to download this file");
+                            outStream.flush();
+                        }
+
+                    }
 
                 }
             }

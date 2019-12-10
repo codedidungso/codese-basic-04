@@ -1,4 +1,6 @@
 
+import DigitalCertificate.Message;
+import DigitalCertificate.VerifyMessage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -12,61 +14,23 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+import javafx.stage.PopupWindow;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import networksecurityproject.FileDialog;
 
 public class test extends Thread {
-
+    
     public test() {
         System.out.println("test run");
     }
+    
+    public static void main(String[] args) throws IOException, Exception {
+        VerifyMessage ms = new VerifyMessage("data\\userdata\\Groups\\thu1\\(nguyenanninh2)data.txt"
+                , "data\\admindata\\keyStore\\publicKeys\\nguyenanninh's_Public_Key.txt");
 
-    public static void main(String[] args) throws IOException {
-        JFrame f = new JFrame();
-        JFileChooser chooser = new JFileChooser();
-        chooser.showOpenDialog(f);
+        
     }
-
-    public void removeLine(String lineContent, File f) throws IOException {
-        File file = f;
-        List<String> out = Files.lines(file.toPath())
-                .filter(line -> !line.contains(lineContent))
-                .collect(Collectors.toList());
-        Files.write(file.toPath(), out, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
-    }
-
-    public void replaceLine(int line, String replace, File f) throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader(f));
-        ArrayList<String> data = new ArrayList<>();
-        String l = reader.readLine();
-        data.add(l);
-        while (l != null) {
-            l = reader.readLine();
-            data.add(l);
-        }
-        reader.close();
-        data.set(line, replace);
-        for (int i = 0; i < data.size(); i++) {
-            System.out.println(data.get(i));
-        }
-        String result = "";
-        for (int i = 0; i < data.size(); i++) {
-            if (i == data.size() - 1) {
-                continue;
-            }
-            result += data.get(i) + "\n";
-
-        }
-        FileWriter fr = new FileWriter(f, false);
-        fr.write(result);
-        fr.flush();
-        fr.close();
-
-    }
-
-    public void run() {
-        System.out.println("Thread run");
-    }
-
+    
 }
