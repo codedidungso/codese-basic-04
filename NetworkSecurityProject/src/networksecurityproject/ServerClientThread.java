@@ -265,6 +265,9 @@ class ServerClientThread extends Thread {
                             //Create Files
                             File privateKey = new File(user_Folder.getPath() + "\\" + user + "'s_Private_Key.txt");
                             File publicKey = new File(".\\data\\admindata\\keyStore\\publicKeys\\" + user + "'s_Public_Key.txt");
+                            File certificateEncoded = new File(user_Folder.getPath() + "\\CertificateEncoded");
+                            File publicKeyToString = new File(".\\data\\admindata\\keyStore\\publicKeys\\" + user + "'s_Public_Key_To_String.txt");
+                            File certificate = new File(user_Folder.getPath() + "\\Certificate");
                             privateKey.createNewFile();
                             publicKey.createNewFile();
                             //Generate KeyPairs
@@ -272,7 +275,23 @@ class ServerClientThread extends Thread {
                             myKeys.createKeys();
                             myKeys.writeToFile(publicKey, myKeys.getPublicKey().getEncoded());
                             myKeys.writeToFile(privateKey, myKeys.getPrivateKey().getEncoded());
+                            myKeys.writeToFile(certificateEncoded, myKeys.getCert().getEncoded());
+                            //publicKeyToString
+                            String pk = myKeys.getPublicKey().toString();
+                            FileWriter fk = new FileWriter(publicKeyToString, true);
+                            fk.write(pk);
+                            fk.flush();
+                            fk.close();
+                            //
+                            // Write Certificate
+                            String Cert = myKeys.getCert().toString();
+                            System.out.println(Cert);
+                            FileWriter fc = new FileWriter(certificate, true);
+                            fc.write(Cert);
+                            fc.flush();
+                            fc.close();
 
+                            //
                             outStream.writeUTF("done");
                             outStream.flush();
                         }
@@ -539,6 +558,7 @@ class ServerClientThread extends Thread {
                                 String dataEncripted = new String(vrm.list.get(0));
                                 File f = new File("G:\\DataDigitalSignatureProject\\" + user + "\\" + filePicked);
                                 FileWriter fr = new FileWriter(f, true);
+                                System.out.println(dataEncripted);
                                 fr.write(dataEncripted);
                                 fr.flush();
                                 fr.close();

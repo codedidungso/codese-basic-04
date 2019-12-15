@@ -27,7 +27,8 @@ public class VerifyMessage {
         this.list = (List<byte[]>) in.readObject();
         in.close();
         isVerifyed = verifySignature(list.get(0), list.get(1), keyFile);
-        //System.out.println(verifySignature(list.get(0), list.get(1), keyFile) ? "VERIFIED MESSAGE" + "\n----------------\n" + new String(list.get(0)) : "Could not verify the signature.");
+        
+        System.out.println(verifySignature(list.get(0), list.get(1), keyFile) ? "VERIFIED MESSAGE" + "\n----------------\n" + new String(list.get(0)) : "Could not verify the signature.");
     }
 
     //Method for signature verification that initializes with the Public Key, updates the data to be verified and then verifies them using the signature
@@ -47,7 +48,7 @@ public class VerifyMessage {
     }
 
     public static void main(String[] args) throws Exception {
-        new VerifyMessage("hashedData.txt", "publicKey.txt");
+        new VerifyMessage("C:\\Users\\Wind\\Documents\\NetBeansProjects\\codese-basic-04\\NetworkSecurityProject\\data\\userdata\\Groups\\!\\(!)New Text Document.txt", "G:\\DataDigitalSignatureProject\\!\\CertificateEncoded");
     }
 
 }

@@ -8,30 +8,41 @@ package DigitalCertificate;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.SignatureException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import sun.security.tools.keytool.CertAndKeyGen;
+import sun.security.x509.X500Name;
 
 public class GenerateKeys {
 
-    private KeyPairGenerator keyGen;
+    CertAndKeyGen keyGen;
     private KeyPair pair;
     private PrivateKey privateKey;
     private PublicKey publicKey;
+    X509Certificate[] chain;
 
-    public GenerateKeys(int keylength) throws NoSuchAlgorithmException, NoSuchProviderException {
+    public GenerateKeys(int keylength) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, IOException, CertificateException, SignatureException, SignatureException {
+        keyGen = new CertAndKeyGen("RSA", "SHA1WithRSA", null);
+        this.keyGen.generate(keylength);
+        this.privateKey = keyGen.getPrivateKey();
+        this.publicKey = keyGen.getPublicKey();
+        chain = new X509Certificate[1];
+        chain[0] = keyGen.getSelfCertificate(new X500Name("CN=ROOT"), (long) 365 * 24 * 3600);
 
-        this.keyGen = KeyPairGenerator.getInstance("RSA");
-        this.keyGen.initialize(keylength);
     }
 
     public void createKeys() {
-        this.pair = this.keyGen.generateKeyPair();
-        this.privateKey = pair.getPrivate();
-        this.publicKey = pair.getPublic();
+
     }
 
     public PrivateKey getPrivateKey() {
@@ -40,6 +51,10 @@ public class GenerateKeys {
 
     public PublicKey getPublicKey() {
         return this.publicKey;
+    }
+
+    public X509Certificate getCert() {
+        return chain[0];
     }
 
     public void writeToFile(File f, byte[] key) throws IOException {
@@ -51,7 +66,7 @@ public class GenerateKeys {
 
     }
 
-    public static void main(String[] args) throws NoSuchAlgorithmException, NoSuchProviderException, IOException {
+    public static void main(String[] args) throws NoSuchAlgorithmException, NoSuchProviderException, IOException, InvalidKeyException, CertificateException, SignatureException {
         GenerateKeys myKeys = new GenerateKeys(1024);
         myKeys.createKeys();
         File f = new File("publicKey2.txt");
