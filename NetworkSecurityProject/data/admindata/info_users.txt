@@ -19,3 +19,5 @@ jjj:jjj
 hh:hh
 tan:tan
 loz:loz
+anhcuong:anhcuong
+nhung:nhung

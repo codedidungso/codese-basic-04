@@ -113,11 +113,11 @@ class ServerClientThread extends Thread {
                 //help
                 if (clientMessage.equals("-help")) {
                     if (isLogin) {
-                        serverMessage = "logined "; // -login
+                        serverMessage = "-createGroup: create your own group \n-join: join a group \n-showGroups: show groups exist \n-getNoti: get your notification \n-upload: upload file \n-download: download file \n-info: get your infomation"; // -login
                         outStream.writeUTF(serverMessage);
                         outStream.flush();
                     } else {
-                        serverMessage = "-login: login app with your account \n-regist: create a new account \n-exit: exit  "; // -login
+                        serverMessage = "-login: login app with your account \n-regist: create a new account \n-showGroups: show groups exist \n-exit: exit  "; // -login
                         outStream.writeUTF(serverMessage);
                         outStream.flush();
                     }
@@ -377,7 +377,7 @@ class ServerClientThread extends Thread {
                         reader.close();
 
                     }
-                    outStream.writeUTF(data + "Which group do you want to join? \n");
+                    outStream.writeUTF(data + "Which group do you want to join?");
                     outStream.flush();
 
                     boolean groupIsValid = false;
@@ -576,6 +576,10 @@ class ServerClientThread extends Thread {
 
                     }
 
+                }//default
+                else {
+                    outStream.writeUTF(clientMessage + " is not recognized as an internal or external command");
+                    outStream.flush();
                 }
             }
             inStream.close();

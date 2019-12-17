@@ -32,7 +32,7 @@ public class Message {
         list.add(sign(data, keyFile));
     }
 
-    //The method that signs the data using the private key that is stored in keyFile path
+    //signs the data using the private key that is stored in keyFile path
     public byte[] sign(String data, String keyFile) throws InvalidKeyException, Exception {
         Signature dsa = Signature.getInstance("SHA1withRSA");
         dsa.initSign(getPrivate(keyFile));
@@ -40,7 +40,7 @@ public class Message {
         return dsa.sign();
     }
 
-    //Method to retrieve the Private Key from a file
+    //retrieve the Private Key from a file
     public PrivateKey getPrivate(String filename) throws Exception {
         byte[] keyBytes = Files.readAllBytes(new File(filename).toPath());
         PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
@@ -48,7 +48,7 @@ public class Message {
         return kf.generatePrivate(spec); // change spec into RSA version
     }
 
-    //Method to write the List of byte[] to a file
+    //write the List of byte[] to a file
     public void writeToFile(String filename) throws FileNotFoundException, IOException {
         File f = new File(filename);
         
