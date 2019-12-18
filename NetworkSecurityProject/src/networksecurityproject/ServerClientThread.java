@@ -108,7 +108,7 @@ class ServerClientThread extends Thread {
         fr.flush();
         fr.close();
 
-    }
+    } // members in groups
 
     public static void getNotification() {
         noti = "";
@@ -129,7 +129,7 @@ class ServerClientThread extends Thread {
             }
 
         }
-    }
+    } //get noti
 
     public static void removeLine(String lineContent, File f) throws IOException {
         File file = f;
@@ -137,7 +137,7 @@ class ServerClientThread extends Thread {
                 .filter(line -> !line.contains(lineContent))
                 .collect(Collectors.toList());
         Files.write(file.toPath(), out, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
-    }
+    } // delete noti
 
     public void run() {
         try {
