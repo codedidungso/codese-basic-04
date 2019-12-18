@@ -12,6 +12,8 @@ import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -25,6 +27,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import org.apache.poi.hwpf.HWPFDocument;
+import org.apache.poi.hwpf.extractor.WordExtractor;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 
 class ServerClientThread extends Thread {
 
@@ -40,6 +45,40 @@ class ServerClientThread extends Thread {
     ServerClientThread(Socket inSocket, int counter) {
         serverClient = inSocket;
         clientNo = counter;
+    }
+
+    public static String readData(String fileName) throws FileNotFoundException, IOException {
+        String result = "";
+        String typeOfFile = fileName.substring(fileName.length() - 4);
+        if (typeOfFile.equals(".doc")) {
+            POIFSFileSystem fs = null;
+            try {
+                fs = new POIFSFileSystem(new FileInputStream(fileName));
+                HWPFDocument doc = new HWPFDocument(fs);
+                WordExtractor we = new WordExtractor(doc);
+                String[] paragraphs = we.getParagraphText();
+                for (int i = 0; i < paragraphs.length; i++) {
+
+                    result += paragraphs[i].toString();
+
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else if (typeOfFile.equals(".txt")) {
+            BufferedReader reader;
+            reader = new BufferedReader(new FileReader(fileName));
+            String line = reader.readLine();
+            result += line + "\r\n";
+            while (line != null) {
+                line = reader.readLine();
+                result += line + "\r\n";
+            }
+
+            reader.close();
+        }
+
+        return result;
     }
 
     public static void replaceLine(int line, String replace, File f) throws IOException {
@@ -505,17 +544,9 @@ class ServerClientThread extends Thread {
                         String groupUploadInTo = inStream.readUTF();
                         //uploadFileHash
                         //-> getDataOfFileChoosen
-                        BufferedReader reader;
+
                         File fileChoosen = new File(pathFile);
-                        reader = new BufferedReader(new FileReader(fileChoosen));
-                        String temp = "";
-                        String fileContent = reader.readLine();
-                        temp += fileContent;
-                        while (fileContent != null) {
-                            temp += fileContent + "\r\n";
-                            fileContent = reader.readLine();
-                        }
-                        reader.close();
+                        String temp = readData(pathFile);
                         Message s = new Message(temp, "G:\\DataDigitalSignatureProject\\" + user + "\\" + user + "'s_Private_Key.txt");
                         s.writeToFile("data\\userdata\\Groups\\" + groupUploadInTo + "\\(" + user + ")" + filePicked);
                         outStream.writeUTF("UPLOAD DONE");

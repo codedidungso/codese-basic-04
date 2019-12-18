@@ -49,3 +49,7 @@ hs_err_pid*
 /NetworkSecurityProject/dist/
 /Lesson09/nbproject/private/
 /Lesson09/build/
+/KeyListenerSample/nbproject/private/
+/KeyListenerSample/build/
+/ReadDocFileSample/nbproject/private/
+/ReadDocFileSample/build/
